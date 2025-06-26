@@ -26,6 +26,19 @@ void populate_monitors(Gtk::ComboBoxText* combo){
     }
 }
 
+void handle_start(Gtk::Button* start_button, Gtk::ComboBoxText* combo, bool& isRunning){
+    //disable the dropdown, and change the button text and set a flag?
+    if(!isRunning){
+        start_button->set_label("Stop Detection");
+        combo->set_sensitive(false);
+    }
+    else {
+        start_button->set_label("Start Detection");
+        combo->set_sensitive(true);
+    }
+    isRunning = !isRunning;
+}
+
 Gtk::Box* build_ui() {
     auto vbox = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_VERTICAL, 5);
     auto combo = Gtk::make_managed<Gtk::ComboBoxText>();
@@ -33,11 +46,12 @@ Gtk::Box* build_ui() {
     //get list of monitor lists
     populate_monitors(combo);
 
-    auto button = Gtk::make_managed<Gtk::Button>("Start");
+    auto button = Gtk::make_managed<Gtk::Button>("Start Detection");
     vbox->pack_start(*button, Gtk::PACK_SHRINK);
 
-    button->signal_clicked().connect([] {
-        std::cout << "Button clicked!" << std::endl;
+    bool isRunning = false;
+    button->signal_clicked().connect([=, &isRunning] {
+        handle_start(button, combo, isRunning);
     });
 
     return vbox;
