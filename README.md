@@ -2,6 +2,7 @@
 this is an app meant to assist visually impaired users get nonverbal information such as body language from video feed
 ## Installation
 To build the app, run this:
+
     mkdir build
     cd build
     cmake .. -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=ON # compile flags for lsp
