@@ -26,15 +26,19 @@ void populate_monitors(Gtk::ComboBoxText* combo){
     }
 }
 
-void handle_start(Gtk::Button* start_button, Gtk::ComboBoxText* combo, bool& isRunning){
+void handle_pressed(Gtk::Button* start_button, Gtk::ComboBoxText* combo, Gtk::TextView* output_box, bool& isRunning){
     //disable the dropdown, and change the button text and set a flag?
     if(!isRunning){
         start_button->set_label("Stop Detection");
         combo->set_sensitive(false);
+        auto buffer = output_box->get_buffer();
+        buffer->insert(buffer->end(), "Detection started...\n");
     }
     else {
         start_button->set_label("Start Detection");
         combo->set_sensitive(true);
+        auto buffer = output_box->get_buffer();
+        buffer->insert(buffer->end(), "Detection stopped...\n");
     }
     isRunning = !isRunning;
 }
@@ -49,10 +53,23 @@ Gtk::Box* build_ui() {
     auto button = Gtk::make_managed<Gtk::Button>("Start Detection");
     vbox->pack_start(*button, Gtk::PACK_SHRINK);
 
-    bool isRunning = false;
-    button->signal_clicked().connect([=, &isRunning] {
-        handle_start(button, combo, isRunning);
-    });
+
+    //auto scroll and so it dosent overflow
+    auto scroll = Gtk::make_managed<Gtk::ScrolledWindow>();
+    scroll->set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+
+    //the acutal textbox for output
+    auto output_box = Gtk::make_managed<Gtk::TextView>();
+    output_box->set_editable(false);
+    scroll->add(*output_box);
+    vbox->pack_start(*scroll, Gtk::PACK_EXPAND_WIDGET);
+
+    //flag for button and handle button clicked(lambda)
+    //shared pointer is safer(using a regular bool gave me seg faults)
+    std::shared_ptr<bool> isRunning = std::make_shared<bool>(false);
+    button->signal_clicked().connect([button, combo, output_box, isRunning] {
+            handle_pressed(button, combo, output_box, *isRunning);
+            });
 
     return vbox;
 }
