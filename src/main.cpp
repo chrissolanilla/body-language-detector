@@ -1,15 +1,18 @@
-#include <gtk/gtk.h>
+#include <gtkmm.h>
+#include "app.h"
 
-int main(int argc, char *argv[]) {
-	gtk_init(&argc, &argv);
-	GtkWidget *window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	gtk_window_set_title(GTK_WINDOW(window), "Hello GTK");
+int main(int argc, char* argv[]) {
+    auto app = Gtk::Application::create(argc, argv, "com.example.bodylanguagec");
 
-	g_signal_connect(window, "destroy", G_CALLBACK(gtk_main_quit), nullptr);
+    Gtk::Window window;
+    window.set_title("Body Language C");
+    window.set_default_size(400, 300);
 
-	gtk_widget_show_all(window);
+    auto content = build_ui();
+    window.add(*content);
 
-	gtk_main();
+    window.show_all();
 
-	return 0;
+    return app->run(window);
 }
+
