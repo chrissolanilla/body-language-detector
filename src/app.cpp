@@ -1,6 +1,8 @@
 #include <iostream>
 #include <sstream>
+#include <atomic>
 #include "app.h"
+#include "pose_runner.h"
 
 void populate_monitors(Gtk::ComboBoxText* combo){
     auto display = Gdk::Display::get_default();
@@ -26,13 +28,17 @@ void populate_monitors(Gtk::ComboBoxText* combo){
     }
 }
 
-void handle_pressed(Gtk::Button* start_button, Gtk::ComboBoxText* combo, Gtk::TextView* output_box, bool& isRunning){
+void handle_pressed(Gtk::Button* start_button, Gtk::ComboBoxText* combo, Gtk::TextView* output_box, bool& isRunning,
+					std::shared_ptr<std::atomic_bool> stopFlag){
     //disable the dropdown, and change the button text and set a flag?
     if(!isRunning){
         start_button->set_label("Stop Detection");
         combo->set_sensitive(false);
         auto buffer = output_box->get_buffer();
         buffer->insert(buffer->end(), "Detection started...\n");
+		//activate the thread
+		stopFlag->store(false);
+		run_pose_on_monitor(combo->get_active_row_number(), output_box, stopFlag);
     }
     else {
         start_button->set_label("Start Detection");
@@ -67,9 +73,11 @@ Gtk::Box* build_ui() {
     //flag for button and handle button clicked(lambda)
     //shared pointer is safer(using a regular bool gave me seg faults)
     std::shared_ptr<bool> isRunning = std::make_shared<bool>(false);
-    button->signal_clicked().connect([button, combo, output_box, isRunning] {
-            handle_pressed(button, combo, output_box, *isRunning);
-            });
+	//i guess this is also a shared pointer, flag for our thread
+	std::shared_ptr<std::atomic_bool> stopFlag = std::make_shared<std::atomic_bool>(false);
+    button->signal_clicked().connect([button, combo, output_box, isRunning, stopFlag] {
+            handle_pressed(button, combo, output_box, *isRunning, stopFlag);
+        });
 
     return vbox;
 }
