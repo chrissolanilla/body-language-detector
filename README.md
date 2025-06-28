@@ -3,6 +3,7 @@ this is an app meant to assist visually impaired users get nonverbal information
 ## Installation
 To build the app, run this:
 
+    git submodule init --init --recursive
     mkdir build
     cd build
     cmake .. -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=ON # compile flags for lsp
