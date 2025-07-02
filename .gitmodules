@@ -1,3 +1,5 @@
 [submodule "extern/extern/mediapipe"]
 	path = extern/extern/mediapipe
 	url = git@github.com:google-ai-edge/mediapipe.git
+[submodule "extern/mediapipe"]
+	url = git@github.com:chrissolanilla/mediapipe.git
