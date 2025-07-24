@@ -59,6 +59,9 @@ Gtk::Box* build_ui() {
     auto button = Gtk::make_managed<Gtk::Button>("Start Detection");
     vbox->pack_start(*button, Gtk::PACK_SHRINK);
 
+	auto testButton = Gtk::make_managed<Gtk::Button>("Run Test");
+	vbox->pack_start(*testButton, Gtk::PACK_SHRINK);
+
 
     //auto scroll and so it dosent overflow
     auto scroll = Gtk::make_managed<Gtk::ScrolledWindow>();
@@ -78,6 +81,12 @@ Gtk::Box* build_ui() {
     button->signal_clicked().connect([button, combo, output_box, isRunning, stopFlag] {
             handle_pressed(button, combo, output_box, *isRunning, stopFlag);
         });
+
+	testButton->signal_clicked().connect([=]() {
+			std::cout << "we dont crash before hitting the button" << std::endl;
+		run_pose_on_video("../test_clips/test.mp4", output_box, stopFlag);
+		std::cout << "we dont crash after hitting the button" << std::endl;
+	});
 
     return vbox;
 }
